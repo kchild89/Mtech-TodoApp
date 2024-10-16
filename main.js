@@ -22,6 +22,26 @@ const taskHeader = document.getElementById("taskHeader");
 let projects = [];
 let selectedProject = null;
 
+// Save Project to Local Storage
+function saveProject() {
+  localStorage.setItem("projects", JSON.stringify(projects));
+}
+
+// Load project from LocalStorage
+function loadProject() {
+  const storedProjects = localStorage.getItem("projects");
+  if (storedProjects) {
+    projects = JSON.parse(storedProjects);
+    projects.forEach((project) => {
+      addProjectToUI(project);
+    });
+  }
+}
+
+window.addEventListener("load", function () {
+  loadProject();
+});
+
 // Open project modal
 newButton.addEventListener("click", function () {
   modal.style.display = "block";
@@ -37,41 +57,16 @@ closeTaskButton.addEventListener("click", function () {
   taskModal.style.display = "none";
 });
 
-// Add project to list
+// Add project to list and save to Local Storage
 addProjectButton.addEventListener("click", function () {
   const projectName = projectNameInput.value;
   if (projectName) {
     const project = { name: projectName, tasks: [] };
     projects.push(project);
 
-    // Create list item for the project
-    const li = document.createElement("li");
-    li.textContent = projectName;
+    saveProject();
 
-    // Add click event to select the project
-    li.addEventListener("click", function () {
-      selectedProject = project;
-      displayTasks(project);
-      taskHeader.textContent = `${project.name} - Tasks`;
-      newTaskButton.disabled = false;
-    });
-
-    // Create trash icon
-    const deleteButton = document.createElement("i");
-    deleteButton.classList.add("fas", "fa-trash-alt", "deleteIcon");
-    deleteButton.style.cursor = "pointer";
-    deleteButton.addEventListener("click", function () {
-      projects = projects.filter((p) => p !== project);
-      li.remove();
-      tasksList.innerHTML = "";
-      selectedProject = null;
-      newTaskButton.disabled = true;
-    });
-
-    // Append project and delete button
-    li.appendChild(deleteButton);
-    projectsList.appendChild(li);
-
+    addProjectToUI(project);
     projectNameInput.value = "";
     modal.style.display = "none";
   } else {
@@ -79,18 +74,52 @@ addProjectButton.addEventListener("click", function () {
   }
 });
 
+function addProjectToUI(project) {
+  const li = document.createElement("li");
+  li.textContent = project.name;
+
+  // Select the project
+  li.addEventListener("click", function () {
+    selectedProject = project;
+    displayTasks(project);
+    taskHeader.textContent = `${project.name} - Tasks`;
+    newTaskButton.disabled = false;
+  });
+
+  // Create trash icon
+  const deleteButton = document.createElement("i");
+  deleteButton.classList.add("fas", "fa-trash-alt", "deleteIcon");
+  deleteButton.style.cursor = "pointer";
+  deleteButton.addEventListener("click", function () {
+    projects = projects.filter((p) => p !== project);
+    li.remove();
+    tasksList.innerHTML = "";
+    selectedProject = null;
+    newTaskButton.disabled = true;
+
+    saveProject();
+  });
+
+  li.appendChild(deleteButton);
+  projectsList.appendChild(li);
+}
+
 // Open task modal
 newTaskButton.addEventListener("click", function () {
   taskModal.style.display = "block";
 });
 
-// Add task to selected project
+// Add task to selected project and save to LocalStorage
 addTaskButton.addEventListener("click", function () {
   if (selectedProject) {
     const taskName = taskNameInput.value;
     if (taskName) {
       selectedProject.tasks.push({ name: taskName, completed: false });
       displayTasks(selectedProject);
+
+      // Save to LocalStorage
+      saveProject();
+
       taskNameInput.value = "";
       taskModal.style.display = "none";
     } else {
@@ -121,6 +150,9 @@ function displayTasks(project) {
       } else {
         li.classList.remove("task-completed");
       }
+
+      // Save to LocalStorage after updating task completion
+      saveProject();
     });
 
     // Create task text
@@ -134,10 +166,13 @@ function displayTasks(project) {
 
     // Add event listener to the delete button
     deleteButton.addEventListener("click", function () {
+      project.tasks = project.tasks.filter((t) => t !== task);
       li.remove();
+
+      // Save to Local Storage after deleting task
+      saveProject();
     });
 
-    // Append checkbox, task text, and delete button to the list item
     li.appendChild(checkbox);
     li.appendChild(taskText);
     li.appendChild(deleteButton);
