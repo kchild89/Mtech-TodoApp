@@ -18,5 +18,51 @@
     <link rel="stylesheet" href="styles.css" />
     <script defer src="main.js"></script>
   </head>
-  <body></body>
+  <body>
+    <div class="title">
+      <h1>To-Do List</h1>
+    </div>
+    <div class="container">
+      <div class="hero">
+        <!-- Left Panel -->
+        <div class="left-panel">
+          <div class="header">
+            <h1>Projects</h1>
+            <button id="newButton">&#10019; New Project</button>
+          </div>
+          <ul class="projectsList"></ul>
+        </div>
+        <!-- Right Panel -->
+        <div class="right-panel">
+          <div class="header">
+            <h1 id="taskHeader">Tasks</h1>
+            <button id="newTaskButton" disabled>&#10019; New Task</button>
+          </div>
+          <ul id="tasksList" class="tasksList"></ul>
+        </div>
+        <!-- Modal -->
+        <div id="projectModal" class="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Project Name</h2>
+            <input
+              type="text"
+              id="projectName"
+              placeholder="Enter project name"
+            />
+            <button id="addProject">Add Project</button>
+          </div>
+        </div>
+        <!-- Task Modal -->
+        <div id="taskModal" class="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Task Name</h2>
+            <input type="text" id="taskName" placeholder="Enter task name" />
+            <button id="addTask">Add Task</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
